@@ -97,3 +97,14 @@ create table emp_map_data
     
  load data local inpath 'file:///tmp/hive_class/map_data.csv' into table emp_map_data;
 
+
+ # map functions
+ select                                                                                                                                  
+    > id,                                                                                                                                     
+    > name,                                                                                                                                   
+    > details,                                                                                                                                
+    > size(details) as size_of_each_map,                                                                                                      
+    > map_keys(details) as distinct_map_keys,                                                                                                 
+    > map_values(details) as distinct_map_values                                                                                              
+    > from employee_map_data; 
+
