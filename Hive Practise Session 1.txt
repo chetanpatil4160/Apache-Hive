@@ -71,3 +71,29 @@ create external table de_data_ext
 # loading data from local to table
 load data local inpath 'file:///tmp/hive_class/array_data.csv' into table emp; 
 
+# to select first emelent from an array we can use
+select id,name,skills[0] as prime_skill from emp
+
+#calculating size and array containing HADOOP
+select                                                                                                                                  
+    > id,                                                                                                                                     
+    > name,                                                                                                                                   
+    > size(skills) as size_of_each_array,    # size is calcluate size of array                                                                                      
+    > array_contains(skills,"HADOOP") as knows_hadoop,  # array_contains works like regex                                                                           
+    > sort_array(skills) as sorted_array  # this function is for sorting array                   
+    > from employee; 
+
+# table for map data ( map means diectinary in python like key vlaue pair)
+create table emp_map_data                                                                                                          
+    > (                                                                                                                                       
+    > id int,                                                                                                                                 
+    > name string,                                                                                                                            
+    > details map<string,string>                                                                                                              
+    > )                                                                                                                                       
+    > row format delimited                                                                                                                    
+    > fields terminated by ','                                                                                                                
+    > collection items terminated by '|'                                                                                                      
+    > map keys terminated by ':';
+    
+ load data local inpath 'file:///tmp/hive_class/map_data.csv' into table emp_map_data;
+
