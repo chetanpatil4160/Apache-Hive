@@ -92,5 +92,5 @@ select year_id from sales_data_orc order by year_id desc
 
 select year_id from sales_data_orc sort by year_id desc
 
-in this number of reduer is 2 but it showing oupt of every mapper not gloabal 
+in this number of reduer is 2 but it showing output of every reducer not gloabal 
 
