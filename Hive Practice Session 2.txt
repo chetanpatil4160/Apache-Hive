@@ -80,4 +80,17 @@ where we firs above query we got only 1 ampper and one reduer
 # change number of reducers to 3
  set mapreduce.job.reduces=3;
 
+# created table using below command
+  create table slaes_year_orc stored as orc as select year_id,sum(sales) as total_sales from sales_data_orc group by year_id;
+
+# When go in the hive warehouse directory and see the number of files for this table is 3 becasue we have set reducers is equal to 3
+# if we set 2 then the files will be 2
+
+# when we use below command 
+select year_id from sales_data_orc order by year_id desc
+ we have set number of reducer 3 still it using 1 and order by globally agrregate data
+
+select year_id from sales_data_orc sort by year_id desc
+
+in this number of reduer is 2 but it showing oupt of every mapper not gloabal 
 
