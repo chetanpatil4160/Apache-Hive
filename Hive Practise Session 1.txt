@@ -10,6 +10,9 @@ create table department_data
     > salary int)                                                                                                                             
     > row format delimited                                                                                                                    
     > fields terminated by ','; 
+
+# Display column name
+set hive.cli.print.header = true;
     
 describe department_data;
 
