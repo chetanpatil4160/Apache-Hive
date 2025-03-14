@@ -2,7 +2,7 @@
 
 https://github.com/shashank-mishra219/Hive-Class/blob/main/sales_order_data.csv
 
-create table sales_order_data_csv_v1
+create table sales_data
 (
 ORDERNUMBER int,
 QUANTITYORDERED int,
@@ -35,7 +35,7 @@ tblproperties("skip.header.line.count"="1") # this property is for to skip the 1
   load data local inpath 'file:///tmp/hive_class/sales_order_data.csv' into table sales_data;
 
 # same table is cretae for orc format
-create table sales_order_data_orc
+create table sales_data_orc
 (
 ORDERNUMBER int,
 QUANTITYORDERED int,
@@ -60,4 +60,24 @@ CONTACTFIRSTNAME string,
 DEALSIZE string
 )
 stored as orc;
+
+# copy data from sales_data into sales_data_orc table using below command
+
+   insert overwrite table sales_data_orc select * from sales_data;
+
+# querying data 
+select year_id,sum(sales) as total_sales from sales_data_orc group by year_id;
+
+where we firs above query we got only 1 ampper and one reduer
+
+# In order to change the average load for a reducer (in bytes):                                                                                 
+  set hive.exec.reducers.bytes.per.reducer=<number>                                                                                           
+# In order to limit the maximum number of reducers:                                                                                             
+  set hive.exec.reducers.max=<number>                                                                                                         
+# In order to set a constant number of reducers:                                                                                                
+  set mapreduce.job.reduces=<number> 
+  
+# change number of reducers to 3
+ set mapreduce.job.reduces=3;
+
 
