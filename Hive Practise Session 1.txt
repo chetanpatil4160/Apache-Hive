@@ -25,7 +25,7 @@ load data local inpath 'file:///tmp/hive_class/depart_data.csv' into table depar
 load data inpath '/tmp/hive_data_class_2/' into table department_data_from_hdfs;
 
 Internal Table: Data Moves to Hive Warehouse
-  - When we load data into an internal table, Hive moves the data from the HDFS location to the table's default location, which is inside the Hive warehouse             (/user/hive/warehouse/<table_name>).
+ - When we load data into an internal table, Hive moves the data from the HDFS location to the table's default location, which is inside the Hive warehouse             (/user/hive/warehouse/<table_name>).
 
  - The original data file is removed from its original location in HDFS after the load.
 
