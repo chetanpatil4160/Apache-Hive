@@ -20,3 +20,18 @@ load data local inpath 'file:///tmp/hive_class/depart_data.csv' into table depar
 
 # Load data from hdfs location
 load data inpath '/tmp/hive_data_class_2/' into table department_data_from_hdfs;
+
+# Creating External table 
+create external table de_data_ext                                                                                          
+    > (                                                                                                                                       
+    > dept_id int,                                                                                                                            
+    > dept_name string,                                                                                                                       
+    > manager_id int,                                                                                                                         
+    > salary int                                                                                                                              
+    > )                                                                                                                                       
+    > row format delimited                                                                                                                    
+    > fields terminated by ','                                                                                                                
+    > location '/tmp/hive_data/';
+
+# in location we have provided dirctory path insted of file because whenever new files com in this directory it automatically reads that files
+
