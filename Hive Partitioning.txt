@@ -1,0 +1,95 @@
+Partitioning in Hive (Beginner-Friendly Explanation)
+
+1. What is Partitioning?
+Partitioning in Hive is a technique used to divide a large table into smaller, manageable pieces based on the values of one or more columns.
+This improves query performance by allowing Hive to scan only relevant partitions instead of the entire table.
+
+2. Why Use Partitioning?
+- Improves query speed by reducing the amount of data scanned.
+- Helps in better organization of data.
+- Optimizes storage and retrieval in distributed systems.
+
+3. Types of Partitioning in Hive
+Hive supports two types of partitioning:
+
+A. Static Partitioning (Manual Partitioning)
+- In static partitioning, you manually specify the partition column while inserting data.
+- Example: Suppose we have a sales dataset with a year column. Instead of storing all the data in one big table, we create partitions based on year.
+
+Example SQL:
+```
+CREATE TABLE sales_static_prt (
+    ORDERNUMBER INT,
+    QUANTITYORDERED INT,
+    YEAR_ID INT,
+    SALES FLOAT
+) PARTITIONED BY (COUNTRY string);
+
+INSERT OVERWRITE TABLE sales_static_prt PARTITION (country='USA')
+SELECT ordernumber, quantityordered, year_id, sales FROM sales_data_orc WHERE country='USA';
+```
+💡 Use Case: When you have structured data and can control partition assignment.
+
+
+B. Dynamic Partitioning (Automatic Partitioning)
+- Hive automatically creates partitions based on column values.
+- You do not need to specify partition values while inserting data.
+- Useful for large datasets where manually specifying partitions is difficult.
+
+Steps to Enable Dynamic Partitioning:
+```
+SET hive.exec.dynamic.partition = true;
+SET hive.exec.dynamic.partition.mode = nonstrict;
+
+INSERT OVERWRITE TABLE sales_dynamic_prt PARTITION (country)
+SELECT ordernumber, quantityordered, year_id, sales FROM sales_data_orc;
+```
+💡 Use Case: When you are loading large data and want Hive to handle partitioning automatically.
+
+4. Static vs. Dynamic Partitioning Example
+
+Static Partitioning Example:
+```
+CREATE TABLE sales_static_prt (
+    ORDERNUMBER INT,
+    QUANTITYORDERED INT,
+    YEAR_ID INT,
+    SALES FLOAT
+) PARTITIONED BY (COUNTRY string);
+
+INSERT OVERWRITE TABLE sales_static_prt PARTITION (country='USA')
+SELECT ordernumber, quantityordered, year_id, sales FROM sales_data_orc WHERE country='USA';
+```
+
+Dynamic Partitioning Example:
+```
+CREATE TABLE sales_dynamic_prt (
+    ORDERNUMBER INT,
+    QUANTITYORDERED INT,
+    YEAR_ID INT,
+    SALES FLOAT
+) PARTITIONED BY (COUNTRY string);
+
+INSERT OVERWRITE TABLE sales_dynamic_prt PARTITION (country)
+SELECT ordernumber, quantityordered, year_id, sales FROM sales_data_orc;
+```
+
+5. How to Check Partitions?
+Once a table is partitioned, you can check its partitions using:
+```
+SHOW PARTITIONS sales;
+```
+
+7. Advantages of Partitioning
+✅ Faster Queries – Queries run faster as Hive reads only required partitions.  
+✅ Efficient Storage – Data is stored in separate directories, making retrieval easy.  
+✅ Better Data Management – Easier to delete or archive specific partitions.
+
+8. When Not to Use Partitioning?
+❌ If the partition column has too many unique values (like user_id), it can create too many small partitions and slow down performance.  
+❌ If the dataset is small, partitioning might not provide significant benefits.
+
+9. Bonus: Bucketing vs Partitioning
+- Partitioning divides data into folders based on a column.
+- Bucketing divides data inside each partition into fixed-size files using hashing.
+- Example: Partition by year, then bucket by customer_id.
