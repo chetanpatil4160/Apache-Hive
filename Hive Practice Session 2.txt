@@ -110,13 +110,3 @@ This is because the number of reducers was set to 3. If set to 2, only 2 files w
   SELECT year_id FROM sales_data_orc SORT BY year_id DESC;
   Unlike ORDER BY, SORT BY distributes sorting across multiple reducers. 
     If 2 reducers are used, each will sort its portion independently. However, the final output may not be globally sorted.
-
-
-CREATE TABLE sales_static_prt (
-    ORDERNUMBER INT,
-    QUANTITYORDERED INT,
-    YEAR_ID INT,
-    SALES FLOAT)
-PARTITIONED BY (COUNTRY string)
-
- insert overwrite table sales_static_prt partition(country='USA') select ordernumber,quantityordered,year_id,sales from sales_data_orc where country='USA';
