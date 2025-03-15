@@ -36,3 +36,80 @@ TBLPROPERTIES("skip.header.line.count"="1");
 4. Load data from hdfs path into "sales_data_assi" 
 
 load data inpath '/tmp/hive_data/sales_order_data.csv' into table sales_data_assi;
+
+5.Create an internal hive table which will store data in ORC format "sales_order_orc"
+
+CREATE TABLE sales_order_orc (
+    ORDERNUMBER INT,
+    QUANTITYORDERED INT,
+    PRICEEACH FLOAT,
+    ORDERLINENUMBER INT,
+    SALES FLOAT,
+    STATUS STRING,
+    QTR_ID INT,
+    MONTH_ID INT,
+    YEAR_ID INT,
+    PRODUCTLINE STRING,
+    MSRP INT,
+    PRODUCTCODE STRING,
+    PHONE STRING,
+    CITY STRING,
+    STATE STRING,
+    POSTALCODE STRING,
+    COUNTRY STRING,
+    TERRITORY STRING,
+    CONTACTLASTNAME STRING,
+    CONTACTFIRSTNAME STRING,
+    DEALSIZE STRING
+)
+STORED AS ORC;
+
+6. Load data from "sales_order_csv" into "sales_order_orc"
+
+INSERT OVERWRITE TABLE sales_order_orc SELECT * FROM sales_data_assi;
+
+Perform below menioned queries on "sales_order_orc" table :
+
+a. Calculatye total sales per year
+
+select year_id,sum(sales) as yearly_sales from sales_order_orc group by year_id;
+
+b. Find a product for which maximum orders were placed
+
+select ordernumber,sum(quantityordered) as total_quantity
+from sales_order_orc
+group by ordernumber 
+order by total_quantity desc limit 1;
+
+c. Calculate the total sales for each quarter
+
+select year_id,qtr_id,sum(sales) as quarterly_sales from sales_order_orc
+group by year_id,qtr_id
+
+d. In which quarter sales was minimum
+
+WITH t1 AS (
+    SELECT a.year_id, 
+           a.qtr_id, 
+           a.quarterly_sales, 
+           DENSE_RANK() OVER (ORDER BY a.quarterly_sales ASC) AS d_rnk 
+    FROM (
+        SELECT year_id, qtr_id, SUM(sales) AS quarterly_sales 
+        FROM sales_order_orc 
+        GROUP BY year_id, qtr_id
+    ) a
+) 
+SELECT * FROM t1 WHERE d_rnk = 1;
+
+e. In which country sales was maximum and in which country sales was minimum
+
+select country,sum(sales) as country_sales from sales_order_orc
+group by country 
+order by country_sales desc
+limit 1
+
+select country,sum(sales) as country_sales from sales_order_orc
+group by country 
+order by country_sales asc
+limit 1
+
