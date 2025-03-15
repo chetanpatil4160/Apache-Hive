@@ -1,96 +1,112 @@
-# download this sales data
+1. Downloading Sales Data
+The sales data can be downloaded from the following GitHub repository:
 
-https://github.com/shashank-mishra219/Hive-Class/blob/main/sales_order_data.csv
+Sales Order Data: https://github.com/shashank-mishra219/Hive-Class/blob/main/sales_order_data.csv
 
-create table sales_data
-(
-ORDERNUMBER int,
-QUANTITYORDERED int,
-PRICEEACH float,
-ORDERLINENUMBER int,
-SALES float,
-STATUS string,
-QTR_ID int,
-MONTH_ID int,
-YEAR_ID int,
-PRODUCTLINE string,
-MSRP int,
-PRODUCTCODE string,
-PHONE string,
-CITY string,
-STATE string,
-POSTALCODE string,
-COUNTRY string,
-TERRITORY string,
-CONTACTLASTNAME string,
-CONTACTFIRSTNAME string,
-DEALSIZE string
+2. Creating the Sales Data Table
+Create a table in Hive to store the sales data.
+
+CREATE TABLE sales_data (
+    ORDERNUMBER INT,
+    QUANTITYORDERED INT,
+    PRICEEACH FLOAT,
+    ORDERLINENUMBER INT,
+    SALES FLOAT,
+    STATUS STRING,
+    QTR_ID INT,
+    MONTH_ID INT,
+    YEAR_ID INT,
+    PRODUCTLINE STRING,
+    MSRP INT,
+    PRODUCTCODE STRING,
+    PHONE STRING,
+    CITY STRING,
+    STATE STRING,
+    POSTALCODE STRING,
+    COUNTRY STRING,
+    TERRITORY STRING,
+    CONTACTLASTNAME STRING,
+    CONTACTFIRSTNAME STRING,
+    DEALSIZE STRING
 )
-row format delimited
-fields terminated by ','
-tblproperties("skip.header.line.count"="1") # this property is for to skip the 1st row while loaing data when we have headers in files
-; 
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+TBLPROPERTIES("skip.header.line.count"="1");
 
-# load data in this table using load command
-  load data local inpath 'file:///tmp/hive_class/sales_order_data.csv' into table sales_data;
+3. Loading Data into the Table
 
-# same table is cretae for orc format
-create table sales_data_orc
-(
-ORDERNUMBER int,
-QUANTITYORDERED int,
-PRICEEACH float,
-ORDERLINENUMBER int,
-SALES float,
-STATUS string,
-QTR_ID int,
-MONTH_ID int,
-YEAR_ID int,
-PRODUCTLINE string,
-MSRP int,
-PRODUCTCODE string,
-PHONE string,
-CITY string,
-STATE string,
-POSTALCODE string,
-COUNTRY string,
-TERRITORY string,
-CONTACTLASTNAME string,
-CONTACTFIRSTNAME string,
-DEALSIZE string
+Use the following command to load data into the sales_data table:
+LOAD DATA LOCAL INPATH 'file:///tmp/hive_class/sales_order_data.csv' INTO TABLE sales_data;
+
+4. Creating the ORC Format Table
+To optimize storage and querying, create a table in ORC format.
+CREATE TABLE sales_data_orc (
+    ORDERNUMBER INT,
+    QUANTITYORDERED INT,
+    PRICEEACH FLOAT,
+    ORDERLINENUMBER INT,
+    SALES FLOAT,
+    STATUS STRING,
+    QTR_ID INT,
+    MONTH_ID INT,
+    YEAR_ID INT,
+    PRODUCTLINE STRING,
+    MSRP INT,
+    PRODUCTCODE STRING,
+    PHONE STRING,
+    CITY STRING,
+    STATE STRING,
+    POSTALCODE STRING,
+    COUNTRY STRING,
+    TERRITORY STRING,
+    CONTACTLASTNAME STRING,
+    CONTACTFIRSTNAME STRING,
+    DEALSIZE STRING
 )
-stored as orc;
+STORED AS ORC;
 
-# copy data from sales_data into sales_data_orc table using below command
+5. Copying Data to ORC Table
 
-   insert overwrite table sales_data_orc select * from sales_data;
+To transfer data from sales_data to sales_data_orc, use:
+INSERT OVERWRITE TABLE sales_data_orc SELECT * FROM sales_data;
 
-# querying data 
-select year_id,sum(sales) as total_sales from sales_data_orc group by year_id;
+6. Querying Data
 
-where we firs above query we got only 1 ampper and one reduer
+To analyze total sales per year:
+SELECT year_id, SUM(sales) AS total_sales FROM sales_data_orc GROUP BY year_id;
 
-# In order to change the average load for a reducer (in bytes):                                                                                 
-  set hive.exec.reducers.bytes.per.reducer=<number>                                                                                           
-# In order to limit the maximum number of reducers:                                                                                             
-  set hive.exec.reducers.max=<number>                                                                                                         
-# In order to set a constant number of reducers:                                                                                                
-  set mapreduce.job.reduces=<number> 
-  
-# change number of reducers to 3
- set mapreduce.job.reduces=3;
+7. Configuring Reducers in Hive
+Hive allows users to configure reducers to optimize performance.
 
-# created table using below command
-  create table slaes_year_orc stored as orc as select year_id,sum(sales) as total_sales from sales_data_orc group by year_id;
+- Adjusting Reducer Load:
+  SET hive.exec.reducers.bytes.per.reducer=<number>;
+- Limiting the Maximum Number of Reducers:
+  SET hive.exec.reducers.max=<number>;
+- Setting a Fixed Number of Reducers:
+  SET mapreduce.job.reduces=<number>;
+Example:
+SET mapreduce.job.reduces=3;
 
-# When go in the hive warehouse directory and see the number of files for this table is 3 becasue we have set reducers is equal to 3
-# if we set 2 then the files will be 2
+8. Creating a Summary Table in ORC Format
 
-# when we use below command 
-select year_id from sales_data_orc order by year_id desc
- we have set number of reducer 3 still it using 1 and order by globally agrregate data
+CREATE TABLE sales_year_orc
+STORED AS ORC
+AS
+SELECT year_id, SUM(sales) AS total_sales
+FROM sales_data_orc
+GROUP BY year_id;
 
-select year_id from sales_data_orc sort by year_id desc
+9. Impact of Reducers on File Count
+After executing the above query, checking the Hive warehouse directory will reveal that the output consists of 3 files. 
+This is because the number of reducers was set to 3. If set to 2, only 2 files would be created.
 
-in this number of reduer is 2 but it showing output of every reducer not gloabal 
+10. Understanding Reducer Behavior in ORDER BY and SORT BY
+
+- ORDER BY:
+  SELECT year_id FROM sales_data_orc ORDER BY year_id DESC;
+  Even when multiple reducers are set, ORDER BY will always use a single reducer because it performs a global sort.
+
+- SORT BY:
+  SELECT year_id FROM sales_data_orc SORT BY year_id DESC;
+  Unlike ORDER BY, SORT BY distributes sorting across multiple reducers. If 2 reducers are used, each will sort its portion independently. However, the final output may not be globally sorted.
 
