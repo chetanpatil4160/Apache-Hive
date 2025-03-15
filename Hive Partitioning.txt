@@ -74,6 +74,18 @@ INSERT OVERWRITE TABLE sales_dynamic_prt PARTITION (country)
 SELECT ordernumber, quantityordered, year_id, sales FROM sales_data_orc;
 ```
 
+# Multi level Partitioning
+'''
+CREATE TABLE sales_multilevel_prt (
+    ORDERNUMBER INT,
+    QUANTITYORDERED INT,
+    SALES FLOAT
+) PARTITIONED BY (COUNTRY string,YEAR_ID int);
+
+INSERT OVERWRITE TABLE sales_multilevel_prt PARTITION (country,year_id)
+SELECT ordernumber, quantityordered, sales,country,year_id FROM sales_data_orc;
+'''
+
 5. How to Check Partitions?
 Once a table is partitioned, you can check its partitions using:
 ```
