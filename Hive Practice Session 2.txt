@@ -108,5 +108,6 @@ This is because the number of reducers was set to 3. If set to 2, only 2 files w
 
 - SORT BY:
   SELECT year_id FROM sales_data_orc SORT BY year_id DESC;
-  Unlike ORDER BY, SORT BY distributes sorting across multiple reducers. If 2 reducers are used, each will sort its portion independently. However, the final output may not be globally sorted.
+  Unlike ORDER BY, SORT BY distributes sorting across multiple reducers. 
+    If 2 reducers are used, each will sort its portion independently. However, the final output may not be globally sorted.
 
