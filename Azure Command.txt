@@ -1,1 +1,26 @@
+There are 3 ways of accessing storage account
+
+
+# 1st -- This command has used to mount azure storage account with dbfs using account key
+
+dbutils.fs.mount(
+     source='wasbs://inputdataset@ttstorageaccount1.blob.core.windows.net',
+     mount_point='/mnt/retaildb',
+     extra_configs={'fs.azure.account.key.ttstorageaccount1.blob.core.windows.net':secret key}
+ )
+
+# using this we can see this mnt
+
+dbutils.fs.ls('/mnt/retaildb/raw')
+
+# reading files from that mounted storage account
+
+df = spark.read.csv("/mnt/retaildb/raw/customers.csv", header=True)
+df.show()
+
+
+
+# 2nd SAS key - Shared Access signature
+
+# 3rd - Service Principle
 
